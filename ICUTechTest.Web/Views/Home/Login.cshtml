@@ -1,0 +1,101 @@
+﻿
+
+@model ICUTechTest.Web.Models.UserModel
+
+@{
+    ViewBag.Title = "Login Form";
+}
+<script src="https://lipis.github.io/bootstrap-sweetalert/lib/sweet-alert.js"></script>
+<link href="~/Content/sweetalert/sweet-alert.css" rel="stylesheet" />
+<link href="~/Content/sweetalert/sweet-alert.css" rel="stylesheet" />
+<div class="row">
+    <br />
+    @using (Html.BeginForm("Login", "Home", FormMethod.Post, new { id = "UserForm", name = "UserForm", @class = "form-horizontal", role = "form" }))
+    {
+        <h2 class="form-group-lg">
+            Login
+        </h2>
+        <fieldset>
+
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })   <!--Enable Data Anotation-->
+            <div class="form-group">
+                @Html.LabelFor(m => m.UserName, new { @class = "col-lg-2 control-label" })
+                <div class="col-lg-10">
+                    @Html.TextBoxFor(m => m.UserName, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.UserName, "", new { @class = "text-danger" }) <!--Display of Error Notification-->
+                </div>
+            </div>
+            <div class="form-group">
+                @Html.LabelFor(m => m.Password, new { @class = "col-lg-2 control-label" })
+                <div class="col-lg-10">
+                    @Html.PasswordFor(m => m.Password, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(m => m.Password, "", new { @class = "text-danger" }) <!--Display of Error Notification-->
+                </div>
+            </div>
+            <div class="form-group">
+                <div class="col-lg-10 col-lg-offset-2">
+                    <button type="submit" id="btnSubmit" class="btn btn-primary">Submit</button>
+                </div>
+            </div>
+        </fieldset>
+    }
+</div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.9/dist/sweetalert2.all.min.js"></script>
+    <link src="https://cdn.jsdelivr.net/npm/sweetalert2@11.1.9/dist/sweetalert2.min.css"/>
+
+   
+    <script type="text/javascript">
+        $(document).ready(function () {
+            
+            $('#btnSubmit').click(function () {
+
+                if ($("#UserForm").valid()) { //check if form is valid using model annotation
+                    $('#UserForm').submit();
+                }
+                else {
+                    return false;
+                }
+            });
+            $("#UserForm").on("submit", function (event) {
+                event.preventDefault();
+                $('#btnSubmit').attr('disabled', 'disabled');
+                var url = $(this).attr("action");
+                var formData = $(this).serialize();
+                $.ajax({
+                    url: url,
+                    type: "POST",
+                    data: formData,
+                    dataType: "json",
+                    success: function (response) {
+                        if (response.Success) {
+                            window.location.href = "@Url.Action("Details", "Home")";
+
+                        }
+                        else {
+                            Swal.fire({
+                                position: 'top-end',
+                                icon: 'error',
+                                title: 'Login Failed',
+                                showConfirmButton: false,
+                                timer: 1500
+                            })
+                          
+
+                        }
+                        
+                    },
+                    error: function (response) {
+                        alert('Error!');
+                    },
+                    complete: function () {
+                        $('#btnSubmit').removeAttr('disabled');
+                    }
+                })
+            });
+        });
+    </script>
+    @Scripts.Render("~/bundles/jqueryval")
+} 
